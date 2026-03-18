@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Transformation | RA-Compliance Audit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --accent: #ff00c8;
+            --bg-dark: #05060a;
+            --card-bg: rgba(15, 18, 30, 0.9);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-glow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        /* ROBUST PRINT CONFIGURATION */
+        @media print {
+            @page {
+                margin: 0;
+                size: portrait;
+            }
+            html, body {
+                height: auto;
+                background-color: var(--bg-dark) !important;
+                color: var(--text-main) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body {
+                padding: 40px !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+            .no-print { display: none !important; }
+            
+            /* Disable blur/transitions for print engine (avoids blank pages) */
+            .glass-card {
+                background: #0f121e !important; 
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border: 1px solid #334155 !important;
+                break-inside: avoid !important;
+                box-shadow: none !important;
+                padding: 40px !important;
+                transition: none !important;
+                transform: none !important;
+            }
+            .container { 
+                max-width: 100% !important; 
+                margin: 0 !important; 
+                width: 100% !important; 
+                transform: none !important;
+                animation: none !important;
+            }
+            h1, h2, h3 { color: #fff !important; text-shadow: none !important; }
+            .badge { border: 1px solid var(--primary) !important; color: var(--primary) !important; background: transparent !important; }
+            pre { background: #000 !important; border: 1px solid #333 !important; }
+            .mermaid { page-break-inside: avoid !important; }
+            .mermaid svg { max-width: 90% !important; height: auto !important; }
+        }
+
+        /* WEB STYLES */
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1100px; width: 95%; margin: 40px auto; position: relative; }
+
+        header { text-align: center; padding: 100px 20px; position: relative; }
+        .title-pre { text-transform: uppercase; letter-spacing: 0.5em; color: var(--primary); font-weight: 700; font-size: 0.8rem; margin-bottom: 20px; display: block; text-shadow: var(--neon-glow); }
+        h1 { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 800; background: linear-gradient(135deg, #fff 40%, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.05em; line-height: 1; }
+        .architect-tag { display: inline-block; margin-top: 30px; padding: 10px 25px; background: linear-gradient(90deg, var(--secondary), var(--accent)); border-radius: 50px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 5px 20px rgba(112, 0, 255, 0.3); border: 1px solid rgba(255,255,255,0.2); }
+
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 50px; margin-bottom: 50px; transition: all 0.4s ease; position: relative; }
+        .glass-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 40px rgba(0, 242, 255, 0.1); }
+
+        h2 { font-size: 2.2rem; margin-bottom: 35px; color: #fff; display: flex; align-items: center; gap: 15px; }
+        h2 span.num { color: var(--primary); font-family: 'JetBrains Mono'; font-weight: 600; font-size: 1.3rem; border: 1px solid var(--primary); padding: 5px 12px; border-radius: 10px; }
+        
+        h3 { color: var(--primary); margin: 35px 0 20px; font-size: 1.5rem; font-weight: 700; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid var(--glass-border); margin: 25px 0; background: rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(255, 255, 255, 0.05); padding: 20px; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 1px solid var(--glass-border); }
+        td { padding: 18px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.95rem; }
+
+        .badge { padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); }
+        .badge-new { color: var(--primary); border-color: var(--primary); }
+        .badge-legacy { color: #ff5555; border-color: #ff5555; }
+
+        pre { background: #010203; padding: 40px; border-radius: 20px; border: 1px solid var(--glass-border); margin: 30px 0; position: relative; }
+        pre::after { content: 'PYTHON :: CORE'; position: absolute; top: 15px; right: 25px; font-size: 0.7rem; color: var(--primary); font-family: 'JetBrains Mono'; opacity: 0.5; }
+        code { font-family: 'JetBrains Mono', monospace; color: #cbd5e1; font-size: 0.9rem; }
+
+        .mermaid { background: rgba(255,255,255,0.02); padding: 40px; border-radius: 24px; border: 1px solid var(--glass-border); margin: 40px 0; display: flex; justify-content: center; overflow: hidden; }
+
+        .ui-controls { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 15px; z-index: 2000; }
+        .btn { background: rgba(15, 18, 30, 0.8); backdrop-filter: blur(10px); border: 1px solid var(--primary); color: var(--primary); padding: 16px 32px; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 12px; transition: all 0.3s; text-decoration: none; text-transform: uppercase; font-size: 0.85rem; }
+        .btn:hover { background: var(--primary); color: var(--bg-dark); }
+
+        .ra-tag { position: absolute; top: 20px; right: 25px; font-size: 0.7rem; color: var(--secondary); font-family: 'JetBrains Mono'; font-weight: 700; background: rgba(112, 0, 255, 0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(112,0,255,0.2); }
+
+        blockquote { border-left: 5px solid var(--primary); padding: 30px 40px; background: linear-gradient(90deg, rgba(0, 242, 255, 0.05), transparent); font-style: italic; border-radius: 0 20px 20px 0; margin: 40px 0; }
+
+        footer { padding: 80px 20px; text-align: center; border-top: 1px solid var(--glass-border); width: 100%; margin-top: 50px; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+
+    <div class="ui-controls no-print">
+        <button class="btn" id="printBtn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            DESCARGAR PDF (RA COMPLIANT)
+        </button>
+    </div>
+
+    <div class="container">
+        <header>
+            <span class="title-pre">Strategic Transition 2026-2031</span>
+            <h1>Digital Audit Report</h1>
+            <div class="architect-tag">Lead Digital Architect | Team Audit</div>
+        </header>
+
+        <section id="block-1">
+            <div class="glass-card">
+                <span class="ra-tag">RA6: a, b, c, d, e</span>
+                <h2><span class="num">01</span> Auditoría y Estrategia</h2>
+                <h3>Strategic Goals</h3>
+                <p>Nuestra misión a 3 años es la erradicación de cuellos de botella mediante **GitOps** y **Cloud Resilience**.</p>
+                <ul>
+                    <li style="margin-bottom: 10px;">45% reducción de Time-to-Market.</li>
+                    <li style="margin-bottom: 10px;">99.99% disponibilidad en AWS/Azure.</li>
+                    <li>30% incremento en productividad vía IA.</li>
+                </ul>
+
+                <h3>Inventory Audit</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Módulo</th>
+                                <th>As-Is</th>
+                                <th>To-Be</th>
+                                <th>Escalabilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Source Code</td>
+                                <td><span class="badge badge-legacy">ZIP / Local</span></td>
+                                <td><span class="badge badge-new">GitHub Enterprise</span></td>
+                                <td>Alta</td>
+                            </tr>
+                            <tr>
+                                <td>Infra</td>
+                                <td><span class="badge badge-legacy">Physical Servers</span></td>
+                                <td><span class="badge badge-new">Docker / PaaS</span></td>
+                                <td>Infinita</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><strong>Futuro (5 Años):</strong> Evolución hacia arquitecturas *Event-Driven* y *Edge* (RA6: d).</p>
+            </div>
+        </section>
+
+        <section id="block-2">
+            <div class="glass-card">
+                <span class="ra-tag">RA5: b | RA6: f, h, i</span>
+                <h2><span class="num">02</span> Arquitectura de Nube</h2>
+                <div class="mermaid">
+                graph TD
+                    User((User)) --> CDN[CloudFront]
+                    CDN --> ALB[Load Balancer]
+                    ALB --> App[Web App PaaS]
+                    App <--> DB[(PostgreSQL IaaS)]
+                    App --> S3[Storage]
+                </div>
+                <h3>Data Life Cycle</h3>
+                <p>Gestionamos el dato desde la **Ingesta** hasta su **Purga definitiva** (RA6: h) automatizada tras 365 días para cumplimiento legal.</p>
+            </div>
+        </section>
+
+        <section id="block-3">
+            <div class="glass-card">
+                <span class="ra-tag">RA4 | RA6: g</span>
+                <h2><span class="num">03</span> Inteligencia y Seguridad</h2>
+                <h3>AI Bug Prediction</h3>
+                <pre><code># AI Quality Audit Block
+from sklearn.ensemble import RandomForest
+
+def evaluate_risk(commit_data):
+    risk = model.predict(commit_data)
+    if risk > 0.8:
+        block_deployment()
+    return risk</code></pre>
+                <h3>Security Guardrails</h3>
+                <p>Implementación de **MFA**, **Cifrado AES-256** y **WAF** para mitigar las 3 brechas críticas identificadas (RA6: g).</p>
+            </div>
+        </section>
+
+        <section id="block-4">
+            <div class="glass-card" style="border-bottom: 2px solid var(--primary);">
+                <span class="ra-tag">RA6: j, k</span>
+                <h2><span class="num">04</span> Recursos Humanos</h2>
+                <h3>Upskilling Journey</h3>
+                <p>Plan de 12 semanas: Formación en **Git**, **Docker** y **Prompt Engineering**.</p>
+                <h3>Change Management</h3>
+                <p>Metodología **ADKAR** enfocada en reducir la resistencia al cambio del personal senior (RA6: k).</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Transforming Business | Digital Audit Certified</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        // Robust Print Execution
+        document.getElementById('printBtn').addEventListener('click', function() {
+            // Small delay to ensure all assets are fully settled
+            setTimeout(function() {
+                window.print();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
